@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #task-list {
+            margin-top: 20px;
+        }
+
+        .task {
+            margin: 10px 0;
+        }
+
+        .task button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Task Manager</h1>
+
+    <h2>Crear Tarea</h2>
+    <form id="task-form">
+        <input type="text" id="task-title" placeholder="Título de la tarea" required />
+        <textarea id="task-description" placeholder="Descripción de la tarea" required></textarea>
+        <button type="submit">Crear Tarea</button>
+    </form>
+
+    <h2>Tareas</h2>
+    <div id="task-list"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
