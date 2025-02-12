@@ -1,5 +1,5 @@
 const express = require('express');
-const tasksRoutes = require('./routes/tasks');
+const obligationsRoutes = require('./routes/obligations');
 
 const app = express();
 
@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 
 // Rutas
-app.use('/api/tasks', tasksRoutes);
+app.use('/api/obligations', obligationsRoutes);
 
 // Ruta inicial de prueba
 app.get('/', (req, res) => {

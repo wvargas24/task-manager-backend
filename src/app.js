@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const taskRoutes = require('./routes/tasks');
-const userRoutes = require('./routes/userRoutes');
+const obligationRoutes = require('./routes/obligationRoutes');
+const memberRoutes = require('./routes/memberRoutes');
 const roleRoutes = require('./routes/roleRoutes');
 require('dotenv').config(); // Cargar variables de entorno
 
@@ -11,8 +11,8 @@ app.use(cors());
 app.use(express.json()); // Para parsear cuerpos JSON
 
 // Rutas
-app.use('/api/tasks', taskRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/obligations', obligationRoutes);
+app.use('/api/members', memberRoutes);
 app.use('/api/roles', roleRoutes);
 
 // Manejo de errores básicos

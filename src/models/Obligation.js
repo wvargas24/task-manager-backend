@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const taskSchema = new mongoose.Schema({
+const obligationSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
@@ -20,7 +20,11 @@ const taskSchema = new mongoose.Schema({
         max: 100,
         default: 0,
     },
-    dueDate: {  // Fecha de vencimiento
+    startDate: {  // Fecha de vencimiento
+        type: Date,
+        required: true,
+    },
+    endDate: {  // Fecha de vencimiento
         type: Date,
         required: true,
     },
@@ -31,9 +35,9 @@ const taskSchema = new mongoose.Schema({
     },
     assignedTo: {  // Responsable de la tarea
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Member',
         required: true,
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Task', taskSchema);
+module.exports = mongoose.model('Obligation', obligationSchema);

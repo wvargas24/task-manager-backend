@@ -1,12 +1,7 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
-    firstName: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    lastName: {
+const memberSchema = new mongoose.Schema({
+    name: {
         type: String,
         required: true,
         trim: true,
@@ -17,7 +12,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         trim: true,
     },
-    avatar: {
+    image: {
         type: String,  // Se puede generar con Gravatar si lo deseas
     },
     role: {
@@ -27,4 +22,4 @@ const userSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Member', memberSchema);

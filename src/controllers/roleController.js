@@ -42,4 +42,28 @@ const deleteRole = async (req, res) => {
     }
 };
 
-module.exports = { getRoles, createRole, deleteRole };
+const createMultipleRoles = async (req, res) => {
+    try {
+        const roles = req.body.roles; // Array de roles a crear
+
+        if (!Array.isArray(roles) || roles.length === 0) {
+            return res.status(400).json({ message: "Debe proporcionar un array de roles válido." });
+        }
+
+        const createdRoles = await Role.insertMany(roles, { ordered: false });
+
+        res.status(201).json({
+            message: "Roles creados exitosamente.",
+            data: createdRoles
+        });
+    } catch (error) {
+        console.error("Error al crear roles:", error);
+        res.status(500).json({
+            message: "Ocurrió un error al crear los roles.",
+            error: error.message
+        });
+    }
+};
+
+
+module.exports = { getRoles, createRole, deleteRole, createMultipleRoles };
