@@ -1,14 +1,7 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 
-dotenv.config(); // Cargar variables de entorno
-
-const MONGO_URI = process.env.MONGO_URI;
-
-if (!MONGO_URI) {
-    console.error("⚠️ No se encontró MONGO_URI en las variables de entorno");
-    process.exit(1);
-}
+// URL de conexión a MongoDB
+const MONGO_URI = process.env.MONGO_URI || MONGO_URI_DEV;
 
 // Conexión a MongoDB
 const connectDB = async () => {
@@ -17,10 +10,10 @@ const connectDB = async () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
-        console.log('✅ Conectado a MongoDB');
+        console.log('Conectado a MongoDB');
     } catch (error) {
-        console.error('❌ Error conectando a MongoDB:', error.message);
-        process.exit(1);
+        console.error('Error conectando a MongoDB:', error.message);
+        process.exit(1); // Salir del proceso si falla la conexión
     }
 };
 
