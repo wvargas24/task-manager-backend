@@ -15,6 +15,15 @@ const memberSchema = new mongoose.Schema({
     image: {
         type: String,  // Se puede generar con Gravatar si lo deseas
     },
+    username: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
     role: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role',
