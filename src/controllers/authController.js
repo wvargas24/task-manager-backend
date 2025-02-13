@@ -30,7 +30,16 @@ exports.login = async (req, res) => {
 
         // Generar y enviar token
         const token = generateToken(member);
-        res.json({ token });
+        res.json({
+            token,
+            user: {
+                id: member._id,
+                username: member.username,
+                role: member.role,
+                name: member.name,  // Agrega más campos según lo que necesites
+                email: member.email
+            }
+        });
     } catch (error) {
         console.error('Error en login:', error);
         res.status(500).json({ message: 'Error en el servidor' });
