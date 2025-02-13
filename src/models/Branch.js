@@ -18,6 +18,11 @@ const branchSchema = new mongoose.Schema({
             type: Number,
             required: true,
         }
+    },
+    company: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Company',
+        required: true,
     }
 }, { timestamps: true });
 
