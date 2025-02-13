@@ -37,7 +37,8 @@ exports.login = async (req, res) => {
                 username: member.username,
                 role: member.role,
                 name: member.name,  // Agrega más campos según lo que necesites
-                email: member.email
+                email: member.email,
+                image: member.image
             }
         });
     } catch (error) {
