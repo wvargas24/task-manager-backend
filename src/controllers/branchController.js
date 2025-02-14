@@ -2,12 +2,13 @@ const Branch = require('../models/Branch');
 const Company = require('../models/Company'); // Importar el modelo de Company
 
 // Obtener todas las sucursales
+// Obtener todas las sucursales
 const getBranches = async (req, res) => {
     try {
         const { companyId } = req.query;  // Recibimos el companyId como parámetro de consulta
 
-        // Buscar las branches que pertenecen a esa companyId
-        const branches = await Branch.find({ company: companyId });
+        // Buscar las branches que pertenecen a esa companyId y poblar la compañía
+        const branches = await Branch.find({ company: companyId }).populate('company');
 
         if (branches.length === 0) {
             return res.status(404).json({ error: 'No se encontraron sucursales' });
@@ -19,18 +20,21 @@ const getBranches = async (req, res) => {
     }
 };
 
+
+// Obtener una sucursal por ID
 // Obtener una sucursal por ID
 const getBranchById = async (req, res) => {
     try {
-        const branch = await Branch.findById(req.params.id).populate('company', 'name');
+        const branch = await Branch.findById(req.params.id).populate('company'); // Cargar toda la info de la compañía
         if (!branch) {
-            return res.status(404).json({ message: 'Branch not found' });
+            return res.status(404).json({ message: 'Sucursal no encontrada' });
         }
         res.status(200).json(branch);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 // Crear una nueva sucursal
 const createBranch = async (req, res) => {
