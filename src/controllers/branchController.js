@@ -4,7 +4,15 @@ const Company = require('../models/Company'); // Importar el modelo de Company
 // Obtener todas las sucursales
 const getBranches = async (req, res) => {
     try {
-        const branches = await Branch.find().populate('company', 'name'); // Obtener el nombre de la compañía
+        const { companyId } = req.query;  // Recibimos el companyId como parámetro de consulta
+
+        // Buscar las branches que pertenecen a esa companyId
+        const branches = await Branch.find({ companyId: companyId });
+
+        if (branches.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron sucursales' });
+        }
+
         res.json(branches);
     } catch (error) {
         res.status(500).json({ error: error.message });

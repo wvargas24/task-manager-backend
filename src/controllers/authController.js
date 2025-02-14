@@ -5,14 +5,14 @@ const jwt = require('jsonwebtoken');
 // Función para generar un token JWT
 const generateToken = (member) => {
     return jwt.sign(
-        { id: member._id, username: member.username, role: member.role },
+        { id: member._id, username: member.username, role: member.role, companyId: member.companyId._id },
         process.env.JWT_SECRET,
         { expiresIn: '1h' } // Expira en 1 hora
     );
 };
 
 // Login de usuario
-exports.login = async (req, res) => {
+const login = async (req, res) => {
     try {
         const { username, password } = req.body;
 
@@ -32,6 +32,7 @@ exports.login = async (req, res) => {
         const token = generateToken(member);
         res.json({
             token,
+            companyId: member.companyId._id,
             user: {
                 id: member._id,
                 username: member.username,
@@ -48,7 +49,7 @@ exports.login = async (req, res) => {
 };
 
 // Registro de usuario (opcional, solo si quieres permitir nuevos registros)
-exports.register = async (req, res) => {
+const register = async (req, res) => {
     try {
         const { username, password, role } = req.body;
 
@@ -73,3 +74,5 @@ exports.register = async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor' });
     }
 };
+
+module.exports = { login, register }

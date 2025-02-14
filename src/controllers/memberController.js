@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const Member = require('../models/Member');
 const Role = require('../models/Role');
+const Company = require('../models/Company');
 
 // Obtener todos los usuarios con su rol
 const getMembers = async (req, res) => {
@@ -15,7 +16,7 @@ const getMembers = async (req, res) => {
 // Crear un nuevo usuario
 const createMember = async (req, res) => {
     try {
-        const { name, email, image, role, username, password } = req.body;
+        const { name, email, image, role, company, username, password } = req.body;
 
         // Verificar si el correo o el usuario ya existen
         const existingMember = await Member.findOne({ $or: [{ email }, { username }] });
@@ -29,6 +30,12 @@ const createMember = async (req, res) => {
             return res.status(400).json({ error: 'Rol no válido' });
         }
 
+        // Verificar si la compañía existe
+        const companyExists = await Company.findById(req.body.company);
+        if (!companyExists) {
+            return res.status(400).json({ error: 'Compañía no válida' });
+        }
+
         // Hashear la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -39,6 +46,7 @@ const createMember = async (req, res) => {
             username,
             password: hashedPassword,
             role,
+            company,
             image: image || `https://www.gravatar.com/avatar/${email}?d=identicon`,
         });
 
@@ -54,7 +62,7 @@ const createMember = async (req, res) => {
 const updateMember = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, image, role, username, password } = req.body;
+        const { name, email, image, role, company, username, password } = req.body;
 
         // Verificar si el usuario existe
         let member = await Member.findById(id);
@@ -82,6 +90,14 @@ const updateMember = async (req, res) => {
             }
         }
 
+        // Verificar si la compañía existe
+        if (company) {
+            const companyExists = await Company.findById(company);
+            if (!companyExists) {
+                return res.status(400).json({ error: 'Compañía no válida' });
+            }
+        }
+
         // Si hay contraseña en la actualización, encriptarla
         let hashedPassword = member.password; // Mantener la contraseña actual si no se cambia
         if (password) {
@@ -91,7 +107,7 @@ const updateMember = async (req, res) => {
         // Actualizar el usuario
         member = await Member.findByIdAndUpdate(
             id,
-            { name, email, image, role, username, password: hashedPassword },
+            { name, email, image, role, company, username, password: hashedPassword },
             { new: true, runValidators: true }
         );
 
