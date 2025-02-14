@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 // Función para generar un token JWT
 const generateToken = (member) => {
     return jwt.sign(
-        { id: member._id, username: member.username, role: member.role, companyId: member.companyId._id },
+        { id: member._id, username: member.username, role: member.role, companyId: member.company._id },
         process.env.JWT_SECRET,
         { expiresIn: '1h' } // Expira en 1 hora
     );
@@ -32,7 +32,7 @@ const login = async (req, res) => {
         const token = generateToken(member);
         res.json({
             token,
-            companyId: member.companyId._id,
+            companyId: member.company._id,
             user: {
                 id: member._id,
                 username: member.username,
