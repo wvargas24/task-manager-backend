@@ -29,7 +29,7 @@ const memberSchema = new mongoose.Schema({
         ref: 'Role',
         required: true,
     },
-    companyId: {
+    company: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Company',
         required: true,
