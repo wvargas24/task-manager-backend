@@ -17,6 +17,11 @@ const branchSchema = new mongoose.Schema({
         longitude: {
             type: Number,
             required: true,
+        },
+        country: {
+            type: String,
+            required: true,  // Asegura que cada sucursal tenga un país definido
+            trim: true,
         }
     },
     company: {

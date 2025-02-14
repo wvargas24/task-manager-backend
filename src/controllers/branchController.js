@@ -22,7 +22,6 @@ const getBranches = async (req, res) => {
 
 
 // Obtener una sucursal por ID
-// Obtener una sucursal por ID
 const getBranchById = async (req, res) => {
     try {
         const branch = await Branch.findById(req.params.id).populate('company'); // Cargar toda la info de la compañía
@@ -35,6 +34,22 @@ const getBranchById = async (req, res) => {
     }
 };
 
+const getBranchesByCountry = async (req, res) => {
+    try {
+        const { country } = req.query;
+
+        if (!country) {
+            return res.status(400).json({ error: 'Se requiere un país para filtrar.' });
+        }
+
+        const branches = await Branch.find({ "location.country": country }).populate('company');
+        res.json(branches);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
 
 // Crear una nueva sucursal
 const createBranch = async (req, res) => {
@@ -42,8 +57,8 @@ const createBranch = async (req, res) => {
         const { name, image, location, company } = req.body;
 
         // Validar que la ubicación tenga latitud y longitud
-        if (!location || typeof location.latitude !== 'number' || typeof location.longitude !== 'number') {
-            return res.status(400).json({ error: 'Ubicación inválida. Se requieren latitud y longitud numéricas.' });
+        if (!location || typeof location.latitude !== 'number' || typeof location.longitude !== 'number' || !location.country) {
+            return res.status(400).json({ error: 'Ubicación inválida. Se requieren latitud, longitud y país.' });
         }
 
         // Validar que se proporcione una compañía
@@ -80,8 +95,8 @@ const updateBranch = async (req, res) => {
         }
 
         // Validar ubicación si se proporciona
-        if (location && (typeof location.latitude !== 'number' || typeof location.longitude !== 'number')) {
-            return res.status(400).json({ error: 'Ubicación inválida. Se requieren latitud y longitud numéricas.' });
+        if (location && (!location.country || typeof location.latitude !== 'number' || typeof location.longitude !== 'number')) {
+            return res.status(400).json({ error: 'Ubicación inválida. Se requieren latitud, longitud y país.' });
         }
 
         // Si se proporciona un nuevo ID de compañía, verificar que exista
@@ -143,4 +158,4 @@ const createMultipleBranches = async (req, res) => {
     }
 };
 
-module.exports = { getBranches, getBranchById, createBranch, updateBranch, deleteBranch, createMultipleBranches };
+module.exports = { getBranches, getBranchById, getBranchesByCountry, createBranch, updateBranch, deleteBranch, createMultipleBranches };
