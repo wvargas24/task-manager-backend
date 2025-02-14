@@ -7,7 +7,7 @@ const getBranches = async (req, res) => {
         const { companyId } = req.query;  // Recibimos el companyId como parámetro de consulta
 
         // Buscar las branches que pertenecen a esa companyId
-        const branches = await Branch.find({ companyId: companyId });
+        const branches = await Branch.find({ company: companyId });
 
         if (branches.length === 0) {
             return res.status(404).json({ error: 'No se encontraron sucursales' });
