@@ -31,16 +31,7 @@ const login = async (req, res) => {
         // Generar y enviar token
         const token = generateToken(member);
         res.json({
-            token,
-            companyId: member.company._id,
-            user: {
-                id: member._id,
-                username: member.username,
-                role: member.role,
-                name: member.name,  // Agrega más campos según lo que necesites
-                email: member.email,
-                image: member.image
-            }
+            token
         });
     } catch (error) {
         console.error('Error en login:', error);

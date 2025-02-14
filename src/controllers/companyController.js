@@ -10,6 +10,20 @@ const getCompanies = async (req, res) => {
     }
 };
 
+// Obtener una compañía por ID
+const getCompanyById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const company = await Company.findById(id);
+        if (!company) {
+            return res.status(404).json({ error: 'Empresa no encontrada' });
+        }
+        res.json(company);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // Crear una nueva compañía
 const createCompany = async (req, res) => {
     try {
@@ -91,4 +105,4 @@ const createMultipleCompanies = async (req, res) => {
     }
 };
 
-module.exports = { getCompanies, createCompany, updateCompany, deleteCompany, createMultipleCompanies };
+module.exports = { getCompanies, getCompanyById, createCompany, updateCompany, deleteCompany, createMultipleCompanies };
