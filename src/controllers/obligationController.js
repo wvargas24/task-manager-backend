@@ -92,7 +92,7 @@ const addCommentToObligation = async (req, res) => {
 
         // Crear el comentario
         const newComment = {
-            text: commentText,
+            description: commentText,  // Debe coincidir con el esquema de la obligación
             member: memberId,
             createdAt: new Date()
         };
@@ -101,11 +101,16 @@ const addCommentToObligation = async (req, res) => {
         obligation.comments.push(newComment);
         await obligation.save();
 
-        res.status(201).json(obligation);
+        // Hacer populate de los comentarios, para traer los datos completos del miembro
+        const populatedObligation = await Obligation.findById(req.params.id)
+            .populate('comments.member', 'name email image');  // Populate de miembro en los comentarios
+
+        res.status(201).json(populatedObligation);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
+
 
 // Crear múltiples obligaciones
 const createMultipleObligations = async (req, res) => {
