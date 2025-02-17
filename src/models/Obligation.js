@@ -37,7 +37,23 @@ const obligationSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Member',
         required: true,
-    }
+    },
+    comments: [{
+        text: {  // Texto del comentario
+            type: String,
+            trim: true,
+            required: true,  // Asegúrate de que no se pueda agregar un comentario vacío
+        },
+        member: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Member',
+            required: true,
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now,  // Se asigna la fecha automáticamente al crear el comentario
+        },
+    }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Obligation', obligationSchema);

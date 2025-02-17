@@ -14,7 +14,7 @@ const getObligations = async (req, res) => {
 // Crear una nueva tarea
 const createObligation = async (req, res) => {
     try {
-        const { title, description, progress, startDate, endDate, assignedTo } = req.body;
+        const { title, description, progress, startDate, endDate, assignedTo, comments } = req.body;
 
         // Verificar si el usuario existe
         const userExists = await User.findById(assignedTo);
@@ -23,7 +23,7 @@ const createObligation = async (req, res) => {
         }
 
         // Crear la tarea
-        const obligation = new Obligation({ title, description, progress, startDate, endDate, assignedTo });
+        const obligation = new Obligation({ title, description, progress, startDate, endDate, assignedTo, comments });
         await obligation.save();
         res.status(201).json(obligation);
     } catch (error) {
@@ -34,7 +34,7 @@ const createObligation = async (req, res) => {
 // Actualizar una tarea
 const updateObligation = async (req, res) => {
     try {
-        const { progress, endDate } = req.body;
+        const { progress, endDate, comments } = req.body;
 
         // Si la fecha de vencimiento ya pasó y no está completa, cambiar estado a "vencida"
         if (endDate && new Date(endDate) < new Date()) {
@@ -44,6 +44,11 @@ const updateObligation = async (req, res) => {
         // Si el progreso llega a 100%, marcar como completada
         if (progress === 100) {
             req.body.status = 'completada';
+        }
+
+        // Agregar comentarios si se incluyen en la solicitud
+        if (comments && Array.isArray(comments)) {
+            req.body.comments = comments;
         }
 
         const obligation = await Obligation.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -68,6 +73,41 @@ const deleteObligation = async (req, res) => {
     }
 };
 
+// Agregar un comentario a una obligación
+const addCommentToObligation = async (req, res) => {
+    try {
+        const { commentText, memberId } = req.body;
+
+        // Verificar si la obligación existe
+        const obligation = await Obligation.findById(req.params.id);
+        if (!obligation) {
+            return res.status(404).json({ error: 'Obligación no encontrada' });
+        }
+
+        // Verificar si el miembro existe
+        const memberExists = await User.findById(memberId);
+        if (!memberExists) {
+            return res.status(400).json({ error: 'El miembro no existe' });
+        }
+
+        // Crear el comentario
+        const newComment = {
+            text: commentText,
+            member: memberId,
+            createdAt: new Date()
+        };
+
+        // Agregar el comentario a la obligación
+        obligation.comments.push(newComment);
+        await obligation.save();
+
+        res.status(201).json(obligation);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+// Crear múltiples obligaciones
 const createMultipleObligations = async (req, res) => {
     try {
         const { data } = req.body; // Se espera un array de obligaciones en el cuerpo de la solicitud
@@ -89,5 +129,11 @@ const createMultipleObligations = async (req, res) => {
     }
 };
 
-
-module.exports = { getObligations, createObligation, updateObligation, deleteObligation, createMultipleObligations };
+module.exports = {
+    getObligations,
+    createObligation,
+    updateObligation,
+    deleteObligation,
+    createMultipleObligations,
+    addCommentToObligation  // Exporte la función nueva
+};
