@@ -13,6 +13,20 @@ const getMembers = async (req, res) => {
     }
 };
 
+// Obtener un usuario por ID
+const getMemberById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const member = await Member.findById(id).populate('role', 'name');
+        if (!member) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+        res.json(member);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // Crear un nuevo usuario
 const createMember = async (req, res) => {
     try {
@@ -118,7 +132,6 @@ const updateMember = async (req, res) => {
     }
 };
 
-
 // Eliminar un usuario
 const deleteMember = async (req, res) => {
     try {
@@ -142,4 +155,4 @@ const createMultipleMembers = async (req, res) => {
     }
 };
 
-module.exports = { getMembers, createMember, updateMember, deleteMember, createMultipleMembers };
+module.exports = { getMembers, getMemberById, createMember, updateMember, deleteMember, createMultipleMembers };
