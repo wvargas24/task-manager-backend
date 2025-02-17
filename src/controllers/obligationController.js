@@ -92,7 +92,7 @@ const addCommentToObligation = async (req, res) => {
 
         // Crear el comentario
         const newComment = {
-            description: commentText,  // Debe coincidir con el esquema de la obligación
+            text: commentText,  // Debe coincidir con el esquema de la obligación
             member: memberId,
             createdAt: new Date()
         };
