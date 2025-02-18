@@ -1,10 +1,14 @@
 const Obligation = require('../models/Obligation');
 const User = require('../models/Member');
+const Branch = require('../models/Branch'); // Asegúrate de importar el modelo Branch
 
 // Obtener todas las tareas con detalles del usuario asignado
 const getObligations = async (req, res) => {
     try {
-        const obligations = await Obligation.find().populate('assignedTo', 'name email image').populate('comments.member', 'name email image');
+        const obligations = await Obligation.find()
+            .populate('assignedTo', 'name email image')
+            .populate('branch', 'name') // Populate para el campo branch
+            .populate('comments.member', 'name email image');
         res.json(obligations);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -14,7 +18,7 @@ const getObligations = async (req, res) => {
 // Crear una nueva tarea
 const createObligation = async (req, res) => {
     try {
-        const { title, description, progress, startDate, endDate, assignedTo, comments } = req.body;
+        const { title, description, progress, startDate, endDate, assignedTo, branch, comments } = req.body;
 
         // Verificar si el usuario existe
         const userExists = await User.findById(assignedTo);
@@ -22,8 +26,14 @@ const createObligation = async (req, res) => {
             return res.status(400).json({ error: 'El usuario asignado no existe' });
         }
 
+        // Verificar si la sucursal existe
+        const branchExists = await Branch.findById(branch);
+        if (!branchExists) {
+            return res.status(400).json({ error: 'La sucursal no existe' });
+        }
+
         // Crear la tarea
-        const obligation = new Obligation({ title, description, progress, startDate, endDate, assignedTo, comments });
+        const obligation = new Obligation({ title, description, progress, startDate, endDate, assignedTo, branch, comments });
         await obligation.save();
         res.status(201).json(obligation);
     } catch (error) {
@@ -34,7 +44,7 @@ const createObligation = async (req, res) => {
 // Actualizar una tarea
 const updateObligation = async (req, res) => {
     try {
-        const { progress, endDate, comments } = req.body;
+        const { progress, endDate, comments, branch } = req.body;
 
         // Si la fecha de vencimiento ya pasó y no está completa, cambiar estado a "vencida"
         if (endDate && new Date(endDate) < new Date()) {
@@ -46,6 +56,14 @@ const updateObligation = async (req, res) => {
             req.body.status = 'completada';
         }
 
+        // Verificar si la sucursal existe (si se está actualizando)
+        if (branch) {
+            const branchExists = await Branch.findById(branch);
+            if (!branchExists) {
+                return res.status(400).json({ error: 'La sucursal no existe' });
+            }
+        }
+
         // Agregar comentarios si se incluyen en la solicitud
         if (comments && Array.isArray(comments)) {
             req.body.comments = comments;
@@ -53,7 +71,7 @@ const updateObligation = async (req, res) => {
 
         const obligation = await Obligation.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
-        if (!obligation) return res.status(404).json({ error: 'Ogligación no encontrada' });
+        if (!obligation) return res.status(404).json({ error: 'Obligación no encontrada' });
 
         res.json(obligation);
     } catch (error) {
@@ -65,9 +83,9 @@ const updateObligation = async (req, res) => {
 const deleteObligation = async (req, res) => {
     try {
         const obligation = await Obligation.findByIdAndDelete(req.params.id);
-        if (!obligation) return res.status(404).json({ error: 'Ogligación no encontrada' });
+        if (!obligation) return res.status(404).json({ error: 'Obligación no encontrada' });
 
-        res.json({ message: 'Ogligación eliminada' });
+        res.json({ message: 'Obligación eliminada' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -92,7 +110,7 @@ const addCommentToObligation = async (req, res) => {
 
         // Crear el comentario
         const newComment = {
-            text: commentText,  // Debe coincidir con el esquema de la obligación
+            text: commentText,
             member: memberId,
             createdAt: new Date()
         };
@@ -111,7 +129,6 @@ const addCommentToObligation = async (req, res) => {
     }
 };
 
-
 // Crear múltiples obligaciones
 const createMultipleObligations = async (req, res) => {
     try {
@@ -119,6 +136,14 @@ const createMultipleObligations = async (req, res) => {
 
         if (!Array.isArray(data) || data.length === 0) {
             return res.status(400).json({ message: "Se requiere un array de obligaciones válido." });
+        }
+
+        // Verificar que todas las obligaciones tengan un branch válido
+        for (const obligation of data) {
+            const branchExists = await Branch.findById(obligation.branch);
+            if (!branchExists) {
+                return res.status(400).json({ error: `La sucursal con ID ${obligation.branch} no existe` });
+            }
         }
 
         const obligations = await Obligation.insertMany(data);
@@ -140,5 +165,5 @@ module.exports = {
     updateObligation,
     deleteObligation,
     createMultipleObligations,
-    addCommentToObligation  // Exporte la función nueva
+    addCommentToObligation
 };

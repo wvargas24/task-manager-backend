@@ -38,6 +38,11 @@ const obligationSchema = new mongoose.Schema({
         ref: 'Member',
         required: true,
     },
+    branch: {  // Responsable de la tarea
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: true,
+    },
     comments: [{
         text: {  // Texto del comentario
             type: String,
