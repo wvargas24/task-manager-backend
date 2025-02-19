@@ -6,6 +6,7 @@ const roleRoutes = require('./routes/roleRoutes');
 const authRoutes = require('./routes/authRoutes');
 const companyRoutes = require('./routes/companyRoutes');
 const branchRoutes = require('./routes/branchRoutes');
+const areaRoutes = require('./routes/areaRoutes');
 require('dotenv').config(); // Cargar variables de entorno
 
 const app = express();
@@ -20,6 +21,7 @@ app.use('/api/roles', roleRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/branches', branchRoutes);
+app.use('/api/areas', areaRoutes);
 
 // Manejo de errores básicos
 app.use((err, req, res, next) => {

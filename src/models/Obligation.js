@@ -28,19 +28,24 @@ const obligationSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
-    status: {  // Estado de la tarea
+    status: {  // Estado de la obligación
         type: String,
         enum: ['pendiente', 'completada', 'vencida'],
         default: 'pendiente',
     },
-    assignedTo: {  // Responsable de la tarea
+    assignedTo: {  // Responsable de la obligación
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Member',
         required: true,
     },
-    branch: {  // Responsable de la tarea
+    branch: {  // Sucursal a la que pertenece la obligación
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branch',
+        required: true,
+    },
+    area: {  // Area a la que pertenece la obligación
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Area',
         required: true,
     },
     comments: [{
