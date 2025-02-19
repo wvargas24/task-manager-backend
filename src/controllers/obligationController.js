@@ -7,7 +7,7 @@ const getObligations = async (req, res) => {
     try {
         const obligations = await Obligation.find()
             .populate('assignedTo', 'name email image')
-            .populate('branch', 'name') // Populate para el campo branch
+            .populate('branch') // Populate para el campo branch
             .populate('comments.member', 'name email image');
         res.json(obligations);
     } catch (error) {
