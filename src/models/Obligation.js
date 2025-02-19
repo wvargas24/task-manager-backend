@@ -30,8 +30,8 @@ const obligationSchema = new mongoose.Schema({
     },
     status: {  // Estado de la obligación
         type: String,
-        enum: ['pendiente', 'completada', 'vencida'],
-        default: 'pendiente',
+        enum: ['sin iniciar', 'completada', 'vencida'],
+        default: 'sin iniciar',
     },
     assignedTo: {  // Responsable de la obligación
         type: mongoose.Schema.Types.ObjectId,

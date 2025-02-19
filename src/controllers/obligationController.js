@@ -174,10 +174,44 @@ const createMultipleObligations = async (req, res) => {
     }
 };
 
+const updateMultipleObligations = async (req, res) => {
+    try {
+        const { currentStatus, newStatus, area, branch } = req.body;
+
+        if (!currentStatus || !newStatus) {
+            return res.status(400).json({ error: "Debes proporcionar el estado actual y el nuevo estado." });
+        }
+
+        // Filtro: Obligaciones con el estado actual y sin área ni branch asignados
+        const filter = {
+            status: currentStatus,
+            $or: [{ area: { $exists: false } }, { area: null }, { branch: { $exists: false } }, { branch: null }]
+        };
+
+        // Campos a actualizar
+        const updateFields = { status: newStatus };
+        if (area) updateFields.area = area;
+        if (branch) updateFields.branch = branch;
+
+        // Actualizar todas las obligaciones que cumplan con el filtro
+        const result = await Obligation.updateMany(filter, { $set: updateFields });
+
+        res.status(200).json({
+            message: "Obligaciones actualizadas correctamente",
+            modifiedCount: result.modifiedCount
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
 module.exports = {
     getObligations,
     createObligation,
     updateObligation,
+    updateMultipleObligations,
     deleteObligation,
     createMultipleObligations,
     addCommentToObligation

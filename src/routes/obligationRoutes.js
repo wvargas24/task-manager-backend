@@ -7,6 +7,7 @@ router.get('/', obligationController.getObligations);
 router.post('/', obligationController.createObligation);
 router.post('/bulk-create', obligationController.createMultipleObligations);
 router.put('/:id', obligationController.updateObligation);
+router.put('/bulk-update', obligationController.updateMultipleObligations);
 router.delete('/:id', obligationController.deleteObligation);
 
 // Ruta para agregar un comentario a una obligación
