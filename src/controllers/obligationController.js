@@ -44,8 +44,6 @@ const createObligation = async (req, res) => {
     }
 };
 
-
-
 // Actualizar una Obligacion
 const updateObligation = async (req, res) => {
     try {
@@ -138,9 +136,11 @@ const addCommentToObligation = async (req, res) => {
     }
 };
 
+// Agregar un reporte a una obligación
 const addReportToObligation = async (req, res) => {
     try {
-        const { progress, status, comment, document, reportedBy } = req.body;
+        const { progress, status, comment, reportedBy } = req.body;
+        const document = req.file ? req.file.path : null; // Obtiene el archivo si se subió
 
         // Verificar si la obligación existe
         const obligation = await Obligation.findById(req.params.id);
@@ -177,7 +177,6 @@ const addReportToObligation = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
-
 
 // Crear múltiples obligaciones
 const createMultipleObligations = async (req, res) => {
