@@ -46,8 +46,7 @@ const createObligation = async (req, res) => {
 
 
 
-// Actualizar una tarea
-// Actualizar una tarea
+// Actualizar una Obligacion
 const updateObligation = async (req, res) => {
     try {
         const { progress, endDate, comments, branch, area } = req.body;
@@ -89,7 +88,7 @@ const updateObligation = async (req, res) => {
 };
 
 
-// Eliminar una tarea
+// Eliminar una Obligacion
 const deleteObligation = async (req, res) => {
     try {
         const obligation = await Obligation.findByIdAndDelete(req.params.id);
@@ -138,6 +137,47 @@ const addCommentToObligation = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+const addReportToObligation = async (req, res) => {
+    try {
+        const { progress, status, comment, document, reportedBy } = req.body;
+
+        // Verificar si la obligación existe
+        const obligation = await Obligation.findById(req.params.id);
+        if (!obligation) {
+            return res.status(404).json({ error: 'Obligación no encontrada' });
+        }
+
+        // Verificar si el usuario que reporta existe
+        const userExists = await User.findById(reportedBy);
+        if (!userExists) {
+            return res.status(400).json({ error: 'El usuario que reporta no existe' });
+        }
+
+        // Crear el nuevo reporte
+        const newReport = {
+            progress,
+            status,
+            comment,
+            document,
+            reportedBy,
+            createdAt: new Date()
+        };
+
+        // Agregar el reporte a la obligación
+        obligation.reports.push(newReport);
+        await obligation.save();
+
+        // Hacer populate de los reportes para mostrar los datos completos del usuario que reportó
+        const updatedObligation = await Obligation.findById(req.params.id)
+            .populate('reports.reportedBy', 'name email image');
+
+        res.status(201).json(updatedObligation);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
 
 // Crear múltiples obligaciones
 const createMultipleObligations = async (req, res) => {
@@ -209,5 +249,6 @@ module.exports = {
     updateMultipleObligations,
     deleteObligation,
     createMultipleObligations,
-    addCommentToObligation
+    addCommentToObligation,
+    addReportToObligation
 };

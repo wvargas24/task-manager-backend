@@ -64,6 +64,33 @@ const obligationSchema = new mongoose.Schema({
             default: Date.now,  // Se asigna la fecha automáticamente al crear el comentario
         },
     }],
+    reports: [{  // Historial de reportes de la obligación
+        progress: {
+            type: Number,
+            min: 0,
+            max: 100,
+        },
+        status: {
+            type: String,
+            enum: ['sin iniciar', 'completada', 'vencida'],
+        },
+        comment: {
+            type: String,
+            trim: true,
+        },
+        document: {
+            type: String, // Se guardará la URL del documento subido
+        },
+        reportedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Member',
+            required: true,
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        },
+    }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Obligation', obligationSchema);

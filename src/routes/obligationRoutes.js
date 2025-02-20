@@ -9,8 +9,7 @@ router.post('/bulk-create', obligationController.createMultipleObligations);
 router.put('/bulk-update', obligationController.updateMultipleObligations);
 router.put('/:id', obligationController.updateObligation);
 router.delete('/:id', obligationController.deleteObligation);
-
-// Ruta para agregar un comentario a una obligación
-router.post('/:id/comments', obligationController.addCommentToObligation); // Nueva ruta
+router.post('/:id/comments', obligationController.addCommentToObligation); // Nueva Ruta para agregar un comentario
+router.post('/:id/reports', addReportToObligation); // Nueva ruta para agregar reportes
 
 module.exports = router;
