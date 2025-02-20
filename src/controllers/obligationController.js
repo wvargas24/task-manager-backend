@@ -141,7 +141,18 @@ const addCommentToObligation = async (req, res) => {
 const addReportToObligation = async (req, res) => {
     try {
         const { progress, status, comment, reportedBy } = req.body;
-        const document = req.file ? req.file.path : null; // Obtiene el archivo si se subió
+
+        // Validar si se subió un archivo
+        if (!req.file) {
+            return res.status(400).json({ error: "Debe subir un documento." });
+        }
+
+        const allowedMimeTypes = ["application/pdf", "image/png", "image/jpeg"];
+        if (!allowedMimeTypes.includes(req.file.mimetype)) {
+            return res.status(400).json({ error: "Formato de archivo no permitido. Solo PDF, PNG y JPG son aceptados." });
+        }
+
+        const documentUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
         // Verificar si la obligación existe
         const obligation = await Obligation.findById(req.params.id);
@@ -160,7 +171,7 @@ const addReportToObligation = async (req, res) => {
             progress,
             status,
             comment,
-            document,
+            document: documentUrl,
             reportedBy,
             createdAt: new Date()
         };
@@ -169,15 +180,17 @@ const addReportToObligation = async (req, res) => {
         obligation.reports.push(newReport);
         await obligation.save();
 
-        // Hacer populate de los reportes para mostrar los datos completos del usuario que reportó
+        // Hacer populate de los reportes
         const updatedObligation = await Obligation.findById(req.params.id)
             .populate('reports.reportedBy', 'name email image');
 
         res.status(201).json(updatedObligation);
     } catch (error) {
+        console.error("Error al agregar reporte:", error);
         res.status(400).json({ error: error.message });
     }
 };
+
 
 // Crear múltiples obligaciones
 const createMultipleObligations = async (req, res) => {
