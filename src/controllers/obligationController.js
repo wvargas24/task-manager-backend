@@ -10,7 +10,8 @@ const getObligations = async (req, res) => {
             .populate('assignedTo', 'name email image')
             .populate('branch') // Populate para el campo branch
             .populate('area') // Populate para el campo area
-            .populate('comments.member', 'name email image');
+            .populate('comments.member', 'name email image')
+            .populate('reports.reportedBy', 'name email image');
         res.json(obligations);
     } catch (error) {
         res.status(500).json({ error: error.message });
