@@ -141,6 +141,7 @@ const addCommentToObligation = async (req, res) => {
 const addReportToObligation = async (req, res) => {
     try {
         const { progress, status, comment, reportedBy } = req.body;
+        console.log("Archivo subido:", req.file);
 
         // Validar si se subió un archivo
         if (!req.file) {
@@ -153,6 +154,7 @@ const addReportToObligation = async (req, res) => {
         }
 
         const documentUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+        console.log("URL del documento:", documentUrl);
 
         // Verificar si la obligación existe
         const obligation = await Obligation.findById(req.params.id);

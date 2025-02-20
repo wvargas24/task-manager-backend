@@ -2,6 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path'); // Importar path
 
+const fs = require('fs');
+const uploadDir = path.join(__dirname, '../uploads');
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+
 const obligationRoutes = require('./routes/obligationRoutes');
 const memberRoutes = require('./routes/memberRoutes');
 const roleRoutes = require('./routes/roleRoutes');
@@ -16,7 +24,7 @@ app.use(cors());
 // Middlewares
 app.use(express.json()); // Para parsear cuerpos JSON
 // Servir archivos estáticos desde la carpeta uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rutas
 app.use('/api/obligations', obligationRoutes);
