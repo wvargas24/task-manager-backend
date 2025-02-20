@@ -9,7 +9,6 @@ const authRoutes = require('./routes/authRoutes');
 const companyRoutes = require('./routes/companyRoutes');
 const branchRoutes = require('./routes/branchRoutes');
 const areaRoutes = require('./routes/areaRoutes');
-const areaRoutes = require('./routes/areaRoutes');
 require('dotenv').config(); // Cargar variables de entorno
 
 const app = express();
