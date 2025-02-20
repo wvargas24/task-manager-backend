@@ -17,38 +17,33 @@ const getObligations = async (req, res) => {
     }
 };
 
-// Crear una nueva tarea
-// Crear una nueva tarea
+// Crear una nueva Obligacion
 const createObligation = async (req, res) => {
     try {
         const { title, description, progress, startDate, endDate, assignedTo, branch, area, comments } = req.body;
 
-        // Verificar si el usuario existe
+        // Verificar si el usuario, sucursal y área existen
         const userExists = await User.findById(assignedTo);
-        if (!userExists) {
-            return res.status(400).json({ error: 'El usuario asignado no existe' });
-        }
-
-        // Verificar si la sucursal existe
         const branchExists = await Branch.findById(branch);
-        if (!branchExists) {
-            return res.status(400).json({ error: 'La sucursal no existe' });
-        }
-
-        // Verificar si el área existe
         const areaExists = await Area.findById(area);
-        if (!areaExists) {
-            return res.status(400).json({ error: 'El área no existe' });
-        }
+
+        if (!userExists) return res.status(400).json({ error: 'El usuario asignado no existe' });
+        if (!branchExists) return res.status(400).json({ error: 'La sucursal no existe' });
+        if (!areaExists) return res.status(400).json({ error: 'El área no existe' });
 
         // Crear la obligación
         const obligation = new Obligation({ title, description, progress, startDate, endDate, assignedTo, branch, area, comments });
         await obligation.save();
-        res.status(201).json(obligation);
+
+        // Poblar los campos antes de devolver la respuesta
+        const populatedObligation = await obligation.populate(['assignedTo', 'branch', 'area']);
+
+        res.status(201).json(populatedObligation);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
+
 
 
 // Actualizar una tarea
