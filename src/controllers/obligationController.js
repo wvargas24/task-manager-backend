@@ -135,13 +135,15 @@ const addReportToObligation = async (req, res) => {
         const { progress, status, comment, reportedBy } = req.body;
         console.log("Archivo subido:", req.file);
 
-        const allowedMimeTypes = ["application/pdf", "image/png", "image/jpeg"];
-        if (!allowedMimeTypes.includes(req.file.mimetype)) {
-            return res.status(400).json({ error: "Formato de archivo no permitido. Solo PDF, PNG y JPG son aceptados." });
+        let documentUrl = ''; // Debe ser let para poder reasignarlo si hay un archivo
+        if (req.file) {
+            const allowedMimeTypes = ["application/pdf", "image/png", "image/jpeg"];
+            if (!allowedMimeTypes.includes(req.file.mimetype)) {
+                return res.status(400).json({ error: "Formato de archivo no permitido. Solo PDF, PNG y JPG son aceptados." });
+            }
+            documentUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+            console.log("URL del documento:", documentUrl);
         }
-
-        const documentUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-        console.log("URL del documento:", documentUrl);
 
         // Verificar si la obligación existe
         const obligation = await Obligation.findById(req.params.id);
@@ -160,7 +162,7 @@ const addReportToObligation = async (req, res) => {
             progress,
             status,
             comment,
-            document: documentUrl,
+            document: documentUrl || null, // Si no hay documento, se almacena como null
             reportedBy,
             createdAt: new Date()
         };
