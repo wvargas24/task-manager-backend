@@ -21,7 +21,7 @@ const getObligations = async (req, res) => {
 // Crear una nueva Obligacion
 const createObligation = async (req, res) => {
     try {
-        const { title, description, progress, startDate, endDate, assignedTo, branch, area, comments } = req.body;
+        const { title, description, progress, startDate, dueDate, assignedTo, branch, area, comments } = req.body;
 
         // Verificar si el usuario, sucursal y área existen
         const userExists = await User.findById(assignedTo);
@@ -33,7 +33,7 @@ const createObligation = async (req, res) => {
         if (!areaExists) return res.status(400).json({ error: 'El área no existe' });
 
         // Crear la obligación
-        const obligation = new Obligation({ title, description, progress, startDate, endDate, assignedTo, branch, area, comments });
+        const obligation = new Obligation({ title, description, progress, startDate, dueDate, assignedTo, branch, area, comments });
         await obligation.save();
 
         // Poblar los campos antes de devolver la respuesta
@@ -48,15 +48,7 @@ const createObligation = async (req, res) => {
 // Actualizar una Obligacion
 const updateObligation = async (req, res) => {
     try {
-        const { progress, endDate, comments, branch, area } = req.body;
-
-        if (endDate && new Date(endDate) < new Date()) {
-            req.body.status = 'vencida';
-        }
-
-        if (progress === 100) {
-            req.body.status = 'completada';
-        }
+        const { progress, dueDate, comments, branch, area } = req.body;
 
         if (branch) {
             const branchExists = await Branch.findById(branch);
@@ -143,11 +135,6 @@ const addReportToObligation = async (req, res) => {
         const { progress, status, comment, reportedBy } = req.body;
         console.log("Archivo subido:", req.file);
 
-        // Validar si se subió un archivo
-        if (!req.file) {
-            return res.status(400).json({ error: "Debe subir un documento." });
-        }
-
         const allowedMimeTypes = ["application/pdf", "image/png", "image/jpeg"];
         if (!allowedMimeTypes.includes(req.file.mimetype)) {
             return res.status(400).json({ error: "Formato de archivo no permitido. Solo PDF, PNG y JPG son aceptados." });
@@ -180,6 +167,23 @@ const addReportToObligation = async (req, res) => {
 
         // Agregar el reporte a la obligación
         obligation.reports.push(newReport);
+
+        // **Actualizar los valores de la obligación según el último reporte**
+        if (progress !== undefined) {
+            obligation.progress = progress; // Actualizar progreso
+            obligation.completed = progress === 100; // Si es 100, marcar como completada
+        }
+
+        if (status) {
+            obligation.status = status; // Actualizar estado según el reporte
+        }
+
+        // Verificar si la obligación está atrasada
+        if (new Date() > obligation.dueDate && !obligation.completed) {
+            obligation.expired = true;
+            obligation.status = 'atrasada';
+        }
+
         await obligation.save();
 
         // Hacer populate de los reportes
