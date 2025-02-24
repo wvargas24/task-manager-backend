@@ -17,7 +17,7 @@ const authRoutes = require('./routes/authRoutes');
 const companyRoutes = require('./routes/companyRoutes');
 const branchRoutes = require('./routes/branchRoutes');
 const areaRoutes = require('./routes/areaRoutes');
-const chatRoutes = require('./routes/chatRoutes');
+// const chatRoutes = require('./routes/chatRoutes');
 require('dotenv').config(); // Cargar variables de entorno
 
 const app = express();
@@ -35,7 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/areas', areaRoutes);
-app.use('/api/chat', chatRoutes);
+// app.use('/api/chat', chatRoutes);
 
 // Manejo de errores básicos
 app.use((err, req, res, next) => {
