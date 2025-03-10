@@ -104,6 +104,18 @@ const obligationSchema = new mongoose.Schema({
 obligationSchema.pre('save', function (next) {
     this.completed = this.progress === 100; // Si progreso es 100, completed será true
     this.expired = new Date() > this.dueDate && !this.completed; // Si está vencida y no completada, expired será true
+
+    // Actualizar el estado en función del progreso
+    if (this.progress === 100) {
+        this.status = 'completada';
+    } else if (this.expired) {
+        this.status = 'atrasada';
+    } else if (this.progress > 0 && this.progress < 100) {
+        this.status = 'en proceso';
+    } else {
+        this.status = 'pendiente';
+    }
+
     next();
 });
 
