@@ -169,16 +169,11 @@ const addReportToObligation = async (req, res) => {
 
         // Agregar el reporte a la obligación
         obligation.reports.push(newReport);
+        obligation.status = status;
 
-        // Actualizar el progreso de la obligación
-        if (progress !== undefined) {
-            obligation.progress = progress;
-            obligation.completed = progress === 100; // Si el progreso es 100, marcar como completada
-        }
-
-        // Actualizar el status de la obligación si el reporte tiene status "en proceso"
-        if (status === 'en proceso') {
-            obligation.status = 'en proceso';
+        if (status === 'completada') {
+            obligation.progress = 100;
+            obligation.completed = true;
         }
 
         // Verificar si la obligación está atrasada
