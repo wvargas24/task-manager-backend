@@ -157,7 +157,7 @@ const addReportToObligation = async (req, res) => {
             return res.status(400).json({ error: 'El usuario que reporta no existe' });
         }
 
-        // Create new report
+        // Crear el nuevo reporte
         const newReport = {
             progress,
             status,
@@ -167,17 +167,18 @@ const addReportToObligation = async (req, res) => {
             createdAt: new Date()
         };
 
-        // Add the report to the obligation
+        // Agregar el reporte a la obligación
         obligation.reports.push(newReport);
 
-        // Update obligation status and progress
+        // Actualizar el progreso de la obligación
         if (progress !== undefined) {
             obligation.progress = progress;
-            obligation.completed = progress === 100; // If progress is 100, set completed to true
+            obligation.completed = progress === 100; // Si el progreso es 100, marcar como completada
         }
 
-        if (status) {
-            obligation.status = status; // Update status
+        // Actualizar el status de la obligación si el reporte tiene status "en proceso"
+        if (status === 'en proceso') {
+            obligation.status = 'en proceso';
         }
 
         // Verificar si la obligación está atrasada
@@ -186,6 +187,7 @@ const addReportToObligation = async (req, res) => {
             obligation.status = 'atrasada';
         }
 
+        // Guardar los cambios en la base de datos
         await obligation.save();
 
         // Hacer populate de los reportes
