@@ -1,7 +1,7 @@
 const Branch = require('../models/Branch');
 const Company = require('../models/Company'); // Importar el modelo de Company
+const Obligation = require('../models/Obligation');
 
-// Obtener todas las sucursales
 // Obtener todas las sucursales
 const getBranches = async (req, res) => {
     try {
@@ -14,7 +14,48 @@ const getBranches = async (req, res) => {
             return res.status(404).json({ error: 'No se encontraron sucursales' });
         }
 
-        res.json(branches);
+        // Obtener las obligaciones para todas las branches
+        const branchesWithObligations = await Promise.all(
+            branches.map(async (branch) => {
+                // Obtener las obligaciones asociadas a esta branch
+                const obligations = await Obligation.find({ branch: branch._id });
+
+                // Calcular la sumatoria de obligaciones por estado
+                const obligationSummary = {
+                    pendiente: 0,
+                    enProceso: 0,
+                    completada: 0,
+                    atrasada: 0,
+                };
+
+                obligations.forEach(obligation => {
+                    switch (obligation.status) {
+                        case 'pendiente':
+                            obligationSummary.pendiente++;
+                            break;
+                        case 'en proceso':
+                            obligationSummary.enProceso++;
+                            break;
+                        case 'completada':
+                            obligationSummary.completada++;
+                            break;
+                        case 'atrasada':
+                            obligationSummary.atrasada++;
+                            break;
+                        default:
+                            break;
+                    }
+                });
+
+                // Devolver la branch con la sumatoria de obligaciones
+                return {
+                    ...branch.toObject(),
+                    obligationSummary,
+                };
+            })
+        );
+
+        res.json(branchesWithObligations);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -24,11 +65,51 @@ const getBranches = async (req, res) => {
 // Obtener una sucursal por ID
 const getBranchById = async (req, res) => {
     try {
-        const branch = await Branch.findById(req.params.id).populate('company'); // Cargar toda la info de la compañía
+        const branchId = req.params.id;
+
+        // Obtener la branch y poblar la información de la compañía
+        const branch = await Branch.findById(branchId).populate('company');
         if (!branch) {
             return res.status(404).json({ message: 'Sucursal no encontrada' });
         }
-        res.status(200).json(branch);
+
+        // Obtener las obligaciones asociadas a esta branch
+        const obligations = await Obligation.find({ branch: branchId });
+
+        // Calcular la sumatoria de obligaciones por estado
+        const obligationSummary = {
+            pendiente: 0,
+            enProceso: 0,
+            completada: 0,
+            atrasada: 0,
+        };
+
+        obligations.forEach(obligation => {
+            switch (obligation.status) {
+                case 'pendiente':
+                    obligationSummary.pendiente++;
+                    break;
+                case 'en proceso':
+                    obligationSummary.enProceso++;
+                    break;
+                case 'completada':
+                    obligationSummary.completada++;
+                    break;
+                case 'atrasada':
+                    obligationSummary.atrasada++;
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        // Agregar la sumatoria a la respuesta
+        const branchWithObligations = {
+            ...branch.toObject(),
+            obligationSummary,
+        };
+
+        res.status(200).json(branchWithObligations);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
