@@ -104,20 +104,17 @@ const obligationSchema = new mongoose.Schema({
 obligationSchema.pre('save', function (next) {
     this.completed = this.progress === 100; // Si progreso es 100, completed será true
     this.expired = new Date() > this.dueDate && !this.completed; // Si está vencida y no completada, expired será true
-
-    // Actualizar el estado en función del progreso
-    // if (this.progress === 100) {
-    //     this.status = 'completada';
-    // } else if (this.expired) {
-    //     this.status = 'atrasada';
-    // } else if (this.progress > 0 && this.progress < 100) {
-    //     this.status = 'en proceso';
-    // } else {
-    //     this.status = 'pendiente';
-    // }
-
     next();
 });
 
+// Transformación para incluir el campo `id` junto con `_id`
+obligationSchema.set('toJSON', {
+    transform: function (doc, ret, options) {
+        ret.id = ret._id;
+        // delete ret._id;
+        // delete ret.__v;
+        return ret;
+    }
+});
 
 module.exports = mongoose.model('Obligation', obligationSchema);
